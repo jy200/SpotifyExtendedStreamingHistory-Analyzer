@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,24 +23,30 @@ public class Main {
         // Prevent error upon skipping several variables in Song.class compared to Spotify JSON
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-//        File test = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\test.json");
-//        JsonNode testNode = mapper.readTree(test);
-//        JsonNode jsonNode = mapper.readTree(new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2014-2015_0.json"));
+        File folder = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources");
+        File[] folderList = folder.listFiles();
+        List<File> parseFolder = new ArrayList<>();
+        assert folderList != null;
+        int fileNum = 0;
+        for (File f: folderList){
+            String fileName = f.getName();
+            if (fileName.contains("Streaming_History_Audio")){
+                parseFolder.add(f);
+            }
+            // limit is 4, num + 1
+            if (fileNum>3){
+                break;
+            }else{
+                fileNum++;
+            }
+        }
 
-
-        // For later: read in all files in folder that contain Streaming_History_Audio
-        File main = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2014-2015_0.json");
-        // Array of all Song class objects found in JSON
-        File main2 = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2015-2016_2.json");
-//        List<Song> myObjects = new ArrayList<>(Arrays.asList(mapper.readValue(main, Song[].class)));
-//        List<Song> myObjects = Arrays.asList(mapper.readValue(main, Song[].class));
-//        myObjects.addAll(Arrays.asList(mapper.readValue(main2, Song[].class)));
         List<Song> myObjects = new ArrayList<>();
-        for (File f : new File[]{main, main2}){
+        for (File f : parseFolder){
             myObjects.addAll(Arrays.asList(mapper.readValue(f, Song[].class)));
         }
 //        Arrays.asList(mapper.readValue(main, Song[].class));
-//        System.exit(0);
+
 
 
         for (Song song: myObjects){
@@ -63,8 +70,7 @@ public class Main {
                         JSONObject songData = songList.getJSONObject(j);
                         if (Objects.equals(songData.optString("Song"), songName)){
                             addSong = false;
-                            // System.out.println("Song is present");
-                            // update
+                            // Song is present: update array
                             songData.put("Times Played", songData.getInt("Times Played") + 1);
                             if (skipped){
                                 songData.put("Times Skipped", songData.getInt("Times Skipped") + 1);
@@ -75,6 +81,7 @@ public class Main {
                         }
                     }
                     if (addSong){
+                        // Song is not present, create new object and add to array
                         JSONObject s = new JSONObject();
                         s.put("Song", songName);
                         s.put("Album", albumName);
@@ -83,7 +90,6 @@ public class Main {
                         s.put("Total Minutes Listened", msPlayed/60000);
                         s.put("Times Played", 1);
                         s.put("Times Skipped", (skipped) ?1:0);
-//                        System.out.println(s);
                         yearData.optJSONArray("Song Data").put(s);
                         yearData.put("Songs Played", yearData.getInt("Songs Played") + 1);
 
@@ -93,6 +99,7 @@ public class Main {
             }
 
             if (addYear){
+                // Year not present
                 // Create a Year Object that contains a SongData Array whose first entry is a Song Object
                 JSONObject y = new JSONObject();
                 JSONArray songData = new JSONArray();
