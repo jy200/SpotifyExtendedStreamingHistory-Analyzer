@@ -1,7 +1,7 @@
 package org.example;
 
 public class Song {
-    public String getTs() {
+    public String getTs(){
         return ts;
     }
 
@@ -33,9 +33,10 @@ public class Song {
         return skipped;
     }
 
+
     /*
         timestamp, song name, artist name, album name, spotify track url
-     */
+    */
     private String ts;
     private int ms_played;
     private String master_metadata_track_name;

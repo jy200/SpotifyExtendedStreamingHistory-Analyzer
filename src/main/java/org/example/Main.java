@@ -1,50 +1,46 @@
 package org.example;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
 public class Main {
-    public static Boolean inDataArray(JSONArray d, String key, String Value){
-        for (int i = 0; i < d.length(); i++){
-            if (Objects.equals(d.getJSONObject(i).optString("key"), Value)) {
-                return true;
-            }
-        }
-        return false;
-    }
     public static void main(String[] args) throws IOException {
+        // Processed output data
+        JSONArray data = new JSONArray();
+
         // Jackson Library for JSON reading
         ObjectMapper mapper = new ObjectMapper();
         // Prevent error upon skipping several variables in Song.class compared to Spotify JSON
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // For later: read in all files in folder that contain Streaming_History_Audio
-        File main = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2014-2015_0.json");
 
 //        File test = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\test.json");
 //        JsonNode testNode = mapper.readTree(test);
 //        JsonNode jsonNode = mapper.readTree(new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2014-2015_0.json"));
 
+
+        // For later: read in all files in folder that contain Streaming_History_Audio
+        File main = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2014-2015_0.json");
         // Array of all Song class objects found in JSON
-        Song[] myObjects = mapper.readValue(main, Song[].class);
-
-        // Processed data
-        JSONArray data = new JSONArray();
-
-//        JSONObject song1 = new JSONObject();
-//        song1.put("2014", new String[]{"hi", "yellow"});
-//        System.out.println(song1);
+        File main2 = new File("E:\\Coding\\Projects-Java\\Spotify-Analyzer\\src\\main\\resources\\Streaming_History_Audio_2015-2016_2.json");
+//        List<Song> myObjects = new ArrayList<>(Arrays.asList(mapper.readValue(main, Song[].class)));
+//        List<Song> myObjects = Arrays.asList(mapper.readValue(main, Song[].class));
+//        myObjects.addAll(Arrays.asList(mapper.readValue(main2, Song[].class)));
+        List<Song> myObjects = new ArrayList<>();
+        for (File f : new File[]{main, main2}){
+            myObjects.addAll(Arrays.asList(mapper.readValue(f, Song[].class)));
+        }
+//        Arrays.asList(mapper.readValue(main, Song[].class));
 //        System.exit(0);
 
-//        ObjectMapper mapper2 = new ObjectMapper();
-//        InputStream is = Test.class.getResourceAsStream("/test.json");
-//        testObj = mapper.readValue(is, Test.class);
 
         for (Song song: myObjects){
             boolean addYear = true;
